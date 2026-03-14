@@ -1033,44 +1033,42 @@ if ('serviceWorker' in navigator) {
 
 <button id="lockZoomBtn" style="
   position: fixed;
-  bottom: calc(20px + env(safe-area-inset-bottom));
-  right: 20px;
-  z-index: 99999;
-  width: 36px;
-  height: 36px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  right: 16px;
+  z-index: 999999;       /* pastikan paling atas semua layer */
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: #6b7280;       /* abu-abu elegan */
-  color: #f9fafb;            /* putih terang */
+  background: rgba(107,114,128,0.8); /* abu-abu transparan */
+  color: #f9fafb;
   border: none;
   font-size: 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
   padding: 0;
   transition: background 0.2s ease;
 ">🔒</button>
 
 <script>
 const lockBtn = document.getElementById('lockZoomBtn');
-let zoomLocked = true; // default terkunci
+let zoomLocked = true;
 
 lockBtn.addEventListener('click', () => {
   const meta = document.querySelector('meta[name=viewport]');
   zoomLocked = !zoomLocked;
 
   if (zoomLocked) {
-    // Kunci zoom
     meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
     lockBtn.textContent = '🔒';
-    lockBtn.style.background = '#6b7280'; // abu-abu
+    lockBtn.style.background = 'rgba(107,114,128,0.8)';
     document.querySelectorAll('input, select, textarea').forEach(el => el.style.fontSize='16px');
   } else {
-    // Buka zoom
     meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
     lockBtn.textContent = '🔓';
-    lockBtn.style.background = '#22c55e'; // hijau
+    lockBtn.style.background = 'rgba(34,197,94,0.8)'; // hijau transparan
   }
 });
 </script>
