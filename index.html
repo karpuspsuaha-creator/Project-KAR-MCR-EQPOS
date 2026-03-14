@@ -1051,6 +1051,26 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
+<script>
+const lockBtn = document.getElementById('lockZoomBtn');
+let zoomLocked = true;
+
+function toggleZoomLock() {
+  const meta = document.querySelector('meta[name=viewport]');
+  if (zoomLocked) {
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
+    lockBtn.textContent = '🔓'; // buka gembok
+    zoomLocked = false;
+  } else {
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    lockBtn.textContent = '🔒'; // kunci
+    zoomLocked = true;
+  }
+}
+
+lockBtn.addEventListener('click', toggleZoomLock);
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <div class="copyright">
