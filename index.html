@@ -381,40 +381,6 @@ body::after {
   <span id="namaPerusahaan"><span style="letter-spacing:3px;">PROJECT&nbsp;</span> MCR</span>
 </div>
 
-<button id="lockZoomBtn" style="
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 9999;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #6b7280;       /* abu-abu elegan */
-  color: #f9fafb;            /* putih terang */
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  padding: 0;
-  transition: background 0.2s ease;
-">🔒</button>
-
-<script>
-const btn = document.getElementById('lockZoomBtn');
-let locked = true; // default terkunci
-btn.onclick = () => {
-  locked = !locked;
-  btn.textContent = locked ? '🔒' : '🔓';
-  btn.style.background = locked ? '#6b7280' : '#22c55e'; // abu-abu / hijau
-  if (locked) {
-    document.querySelectorAll('input, select, textarea').forEach(el => el.style.fontSize='16px');
-  }
-};
-</script>
-
 <div id="lokasiInfo">GPS: mencari...</div>
 <div class="container grid">
 <!-- FORM INPUT -->
@@ -1065,24 +1031,48 @@ if ('serviceWorker' in navigator) {
 }
 </script>
 
+<button id="lockZoomBtn" style="
+  position: fixed;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  right: 20px;
+  z-index: 99999;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #6b7280;       /* abu-abu elegan */
+  color: #f9fafb;            /* putih terang */
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  padding: 0;
+  transition: background 0.2s ease;
+">🔒</button>
+
 <script>
 const lockBtn = document.getElementById('lockZoomBtn');
-let zoomLocked = true;
+let zoomLocked = true; // default terkunci
 
-function toggleZoomLock() {
+lockBtn.addEventListener('click', () => {
   const meta = document.querySelector('meta[name=viewport]');
-  if (zoomLocked) {
-    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
-    lockBtn.textContent = '🔓'; // buka gembok
-    zoomLocked = false;
-  } else {
-    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-    lockBtn.textContent = '🔒'; // kunci
-    zoomLocked = true;
-  }
-}
+  zoomLocked = !zoomLocked;
 
-lockBtn.addEventListener('click', toggleZoomLock);
+  if (zoomLocked) {
+    // Kunci zoom
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    lockBtn.textContent = '🔒';
+    lockBtn.style.background = '#6b7280'; // abu-abu
+    document.querySelectorAll('input, select, textarea').forEach(el => el.style.fontSize='16px');
+  } else {
+    // Buka zoom
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
+    lockBtn.textContent = '🔓';
+    lockBtn.style.background = '#22c55e'; // hijau
+  }
+});
 </script>
 
 
