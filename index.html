@@ -593,8 +593,10 @@ lockBtn.addEventListener('click', toggleZoomLock);
 <th>Longitude</th>
 <th>Aksi</th>
 <div class="actions far" style="margin-top:12px;">
+  <div class="pagination" style="display:flex; justify-content:flex-start; gap:8px; margin-top:12px;">
   <button class="btn secondary" id="prevBtn">Prev</button>
   <button class="btn secondary" id="nextBtn">Next</button>
+</div>
 </div>
 </tr>
 </thead>
@@ -1072,28 +1074,71 @@ if("geolocation"in navigator){
 
 <script>
 const perPage = 10;
-let page = 0; // 0 = 10 data terakhir
+let page = 0; // halaman aktif
+let filteredData = []; // hasil filter saat ini
 
-function renderPage() {
+function renderDataPage() {
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
-  const arr = load();
 
-  const start = Math.max(arr.length - (page + 1)*perPage, 0);
-  const end = arr.length - page*perPage;
-  const batch = arr.slice(start, end);
+  // load data & filter
+  let arr = load();
+  const fs = document.getElementById('filterShift').value;
+  const fd = document.getElementById('filterDate').value;
+
+  filteredData = arr.filter(x => {
+    return (!fs || String(x.shift) === String(fs)) &&
+           (!fd || x.tanggal === fd);
+  });
+
+  document.getElementById('totalInfo').textContent = `${filteredData.length} data`;
+
+  // paging
+  const start = page * perPage;
+  const end = start + perPage;
+  const batch = filteredData.slice(start, end);
 
   batch.forEach((r,i)=>{
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${start+i+1}</td><td>${r.tanggal}</td> ... <td>...</td>`;
+    const badge = `<span class="badge ${r.shift==1?'s1':'s2'}">${r.shift==1?'Shift 1':'Shift 2'}</span>`;
+    tr.innerHTML = `
+      <td>${start+i+1}</td>
+      <td>${r.tanggal}</td>
+      <td>${r.jam}</td>
+      <td>${badge}</td>
+      <td>${r.equipment||''}</td>
+      <td>${r.hauler}</td>
+      <td>${r.front}</td>
+      <td>${r.Located}</td>
+      <td>${r.category}</td>
+      <td>${r.unitRunning||'-'}</td>
+      <td>${r.unitNoRunning||'-'}</td>
+      <td>${r.keterangan}</td>
+      <td>${r.lat?r.lat.toFixed(5):'-'}</td>
+      <td>${r.lon?r.lon.toFixed(5):'-'}</td>
+      <td><button class="btn danger" onclick="hapusModern(${start+i},this)">Hapus</button></td>
+    `;
     tbody.appendChild(tr);
   });
 }
 
-document.getElementById('prevBtn').addEventListener('click',()=>{ page++; renderPage(); });
-document.getElementById('nextBtn').addEventListener('click',()=>{ page--; renderPage(); });
-document.getElementById('filterShift').addEventListener('change',()=>{ page=0; render(); });
-document.getElementById('filterDate').addEventListener('change',()=>{ page=0; render(); });
+// tombol paging
+document.getElementById('prevBtn').addEventListener('click',()=>{
+  if((page+1)*perPage < filteredData.length){ page++; renderDataPage(); }
+});
+document.getElementById('nextBtn').addEventListener('click',()=>{
+  if(page>0){ page--; renderDataPage(); }
+});
+
+// filter reset
+document.getElementById('filterShift').addEventListener('change',()=>{
+  page = 0;
+  renderDataPage();
+});
+document.getElementById('filterDate').addEventListener('change',()=>{
+  page = 0;
+  renderDataPage();
+});
 </script>
   
 <script>
