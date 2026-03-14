@@ -1,5 +1,5 @@
 // sw.js
-const CACHE_VERSION = '20250904'; // bisa diganti saat deploy
+const CACHE_VERSION = '20250905'; // bisa diganti saat deploy
 const CACHE_NAME = `Equipment-cache-${CACHE_VERSION}`;
 
 const ASSETS_TO_CACHE = [
