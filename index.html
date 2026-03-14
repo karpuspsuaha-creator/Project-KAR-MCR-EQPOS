@@ -1034,7 +1034,8 @@ if ('serviceWorker' in navigator) {
 <button id="lockZoomBtn" style="
   position: fixed;
   bottom: calc(16px + env(safe-area-inset-bottom));
-  right: 16px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 999999;       /* pastikan paling atas semua layer */
   width: 32px;
   height: 32px;
@@ -1072,7 +1073,6 @@ lockBtn.addEventListener('click', () => {
   }
 });
 </script>
-
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
