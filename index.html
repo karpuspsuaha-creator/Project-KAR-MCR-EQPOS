@@ -592,16 +592,16 @@ lockBtn.addEventListener('click', toggleZoomLock);
 <th>Latitude</th>
 <th>Longitude</th>
 <th>Aksi</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
 <div class="actions far" style="margin-top:12px;">
   <div class="pagination" style="display:flex; justify-content:flex-start; gap:8px; margin-top:12px;">
   <button class="btn secondary" id="prevBtn">Prev</button>
   <button class="btn secondary" id="nextBtn">Next</button>
 </div>
 </div>
-</tr>
-</thead>
-<tbody id="tbody"></tbody>
-</table>
 </div>
 <div style="margin-top:24px" class="actions far">
 <button class="btn warn" onclick="exportExcelFiltered()">Export Excel</button>
@@ -880,11 +880,16 @@ document.addEventListener('keydown',e=>{
 });
 
 // ==== TABEL ====
+
 function escapeHtml(s){
   return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
 }
 
+let page = 0;
+const perPage = 10;
+
 function render(){
+
   const tbody = document.getElementById('tbody');
   tbody.innerHTML = '';
 
@@ -893,29 +898,49 @@ function render(){
   const fd = document.getElementById('filterDate').value;
 
   let data = arr;
+
   if(fs) data = data.filter(x => String(x.shift) === String(fs));
   if(fd) data = data.filter(x => x.tanggal === fd);
 
   document.getElementById('totalInfo').textContent = `${data.length} data`;
 
-  data.forEach((r, idx) => {
-    // --- 🧠 COCOKKAN DENGAN MASTER UNIT JIKA ADA (hanya untuk hauler) ---
-    function fixUnit(prefix, codeOrFull) {
-      if (!prefix || !MASTER_UNITS[prefix]) return codeOrFull;
+  // kalau halaman terlalu besar reset
+  if(page * perPage >= data.length){
+    page = 0;
+  }
+
+  const start = page * perPage;
+  const end = start + perPage;
+  const batch = data.slice(start,end);
+
+  batch.forEach((r,i)=>{
+
+    const idx = start + i;
+
+    function fixUnit(prefix, codeOrFull){
+      if(!prefix || !MASTER_UNITS[prefix]) return codeOrFull;
+
       const short = codeOrFull.split('-').pop();
-      const found = MASTER_UNITS[prefix].find(x => x.endsWith(`-${short.padStart(3, '0')}`));
+
+      const found = MASTER_UNITS[prefix].find(x =>
+        x.endsWith(`-${short.padStart(3,'0')}`)
+      );
+
       return found || codeOrFull;
     }
 
-    // Perbaiki hauler jika ada di master unit
-    if (r.hauler && r.hauler.includes('-')) {
+    if(r.hauler && r.hauler.includes('-')){
       const prefix = r.hauler.split('-')[0];
-      r.hauler = fixUnit(prefix, r.hauler);
+      r.hauler = fixUnit(prefix,r.hauler);
     }
 
-    // --- 🧩 BUAT BARIS TABEL ---
     const tr = document.createElement('tr');
-    const badge = `<span class="badge ${r.shift==1?'s1':'s2'}">${r.shift==1?'Shift 1':'Shift 2'}</span>`;
+
+    const badge = `
+      <span class="badge ${r.shift==1?'s1':'s2'}">
+      ${r.shift==1?'Shift 1':'Shift 2'}
+      </span>
+    `;
 
     tr.innerHTML = `
       <td>${idx+1}</td>
@@ -930,19 +955,62 @@ function render(){
       <td>${r.unitRunning || '-'}</td>
       <td>${r.unitNoRunning || '-'}</td>
       <td>${escapeHtml(r.keterangan)}</td>
-      <td>${r.lat?r.lat.toFixed(5):'-'}</td>
-      <td>${r.lon?r.lon.toFixed(5):'-'}</td>
-      <td><button class="btn danger" onclick="hapusModern(${idx},this)">Hapus</button></td>
+      <td>${r.lat ? r.lat.toFixed(5) : '-'}</td>
+      <td>${r.lon ? r.lon.toFixed(5) : '-'}</td>
+      <td>
+        <button class="btn danger"
+        onclick="hapusModern(${idx},this)">
+        Hapus
+        </button>
+      </td>
     `;
+
     tbody.appendChild(tr);
+
   });
+
 }
+
+document.getElementById('prevBtn').onclick = ()=>{
+
+  if(page > 0){
+    page--;
+    render();
+  }
+
+}
+
+document.getElementById('nextBtn').onclick = ()=>{
+
+  const arr = load();
+
+  const fs = document.getElementById('filterShift').value;
+  const fd = document.getElementById('filterDate').value;
+
+  let data = arr;
+
+  if(fs) data = data.filter(x => String(x.shift) === String(fs));
+  if(fd) data = data.filter(x => x.tanggal === fd);
+
+  if((page+1)*perPage < data.length){
+    page++;
+    render();
+  }
+
+}
+
+render();
 
 function clearFilter(){
   document.getElementById('filterShift').value = '';
   document.getElementById('filterDate').value = '';
+  page = 0;
   render();
 }
+
+<span id="pageInfo"></span>
+document.getElementById('pageInfo').textContent =
+`Page ${page+1} / ${Math.ceil(data.length/perPage) || 1}`;
 
 // ==== HAPUS ====
 function hapusModern(i,btn){
@@ -1070,75 +1138,6 @@ if("geolocation"in navigator){
 }else{
   document.getElementById("lokasiInfo").textContent="GPS tidak tersedia";
 }
-</script>
-
-<script>
-const perPage = 10;
-let page = 0; // halaman aktif
-let filteredData = []; // hasil filter saat ini
-
-function renderDataPage() {
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '';
-
-  // load data & filter
-  let arr = load();
-  const fs = document.getElementById('filterShift').value;
-  const fd = document.getElementById('filterDate').value;
-
-  filteredData = arr.filter(x => {
-    return (!fs || String(x.shift) === String(fs)) &&
-           (!fd || x.tanggal === fd);
-  });
-
-  document.getElementById('totalInfo').textContent = `${filteredData.length} data`;
-
-  // paging
-  const start = page * perPage;
-  const end = start + perPage;
-  const batch = filteredData.slice(start, end);
-
-  batch.forEach((r,i)=>{
-    const tr = document.createElement('tr');
-    const badge = `<span class="badge ${r.shift==1?'s1':'s2'}">${r.shift==1?'Shift 1':'Shift 2'}</span>`;
-    tr.innerHTML = `
-      <td>${start+i+1}</td>
-      <td>${r.tanggal}</td>
-      <td>${r.jam}</td>
-      <td>${badge}</td>
-      <td>${r.equipment||''}</td>
-      <td>${r.hauler}</td>
-      <td>${r.front}</td>
-      <td>${r.Located}</td>
-      <td>${r.category}</td>
-      <td>${r.unitRunning||'-'}</td>
-      <td>${r.unitNoRunning||'-'}</td>
-      <td>${r.keterangan}</td>
-      <td>${r.lat?r.lat.toFixed(5):'-'}</td>
-      <td>${r.lon?r.lon.toFixed(5):'-'}</td>
-      <td><button class="btn danger" onclick="hapusModern(${start+i},this)">Hapus</button></td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-// tombol paging
-document.getElementById('prevBtn').addEventListener('click',()=>{
-  if((page+1)*perPage < filteredData.length){ page++; renderDataPage(); }
-});
-document.getElementById('nextBtn').addEventListener('click',()=>{
-  if(page>0){ page--; renderDataPage(); }
-});
-
-// filter reset
-document.getElementById('filterShift').addEventListener('change',()=>{
-  page = 0;
-  renderDataPage();
-});
-document.getElementById('filterDate').addEventListener('change',()=>{
-  page = 0;
-  renderDataPage();
-});
 </script>
   
 <script>
