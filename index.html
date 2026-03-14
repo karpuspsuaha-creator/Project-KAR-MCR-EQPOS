@@ -592,6 +592,10 @@ lockBtn.addEventListener('click', toggleZoomLock);
 <th>Latitude</th>
 <th>Longitude</th>
 <th>Aksi</th>
+<div class="actions far" style="margin-top:12px;">
+  <button class="btn secondary" id="prevBtn">Prev</button>
+  <button class="btn secondary" id="nextBtn">Next</button>
+</div>
 </tr>
 </thead>
 <tbody id="tbody"></tbody>
@@ -931,11 +935,6 @@ function render(){
     tbody.appendChild(tr);
   });
 }
-
-<div class="actions far" style="margin-top:12px;">
-  <button class="btn secondary" id="prevBtn">Prev</button>
-  <button class="btn secondary" id="nextBtn">Next</button>
-</div>
 
 function clearFilter(){
   document.getElementById('filterShift').value = '';
