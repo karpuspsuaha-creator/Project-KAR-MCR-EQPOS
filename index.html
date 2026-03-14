@@ -1076,22 +1076,34 @@ if ('serviceWorker' in navigator) {
 
 <script>
 const lockBtn = document.getElementById('lockZoomBtn');
-let zoomLocked = true;
+let zoomLocked = true; // default terkunci
 
 function toggleZoomLock() {
   const meta = document.querySelector('meta[name=viewport]');
+  if (!meta) return;
+
   if (zoomLocked) {
+    // buka zoom (boleh pinch)
     meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
-    lockBtn.textContent = '🔓'; // buka gembok
+    lockBtn.textContent = '🔓';
+    lockBtn.style.background = '#22c55e'; // hijau
     zoomLocked = false;
   } else {
+    // kunci zoom (mati total)
     meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-    lockBtn.textContent = '🔒'; // kunci
+    lockBtn.textContent = '🔒';
+    lockBtn.style.background = '#6b7280'; // abu-abu elegan
     zoomLocked = true;
   }
 }
 
 lockBtn.addEventListener('click', toggleZoomLock);
+
+// Pastikan semua input font minimal 16px supaya HP tidak auto-zoom
+document.querySelectorAll('input, select, textarea').forEach(el => {
+  el.style.fontSize = '16px';
+  el.style.webkitTextSizeAdjust = '100%';
+});
 </script>
 
 
