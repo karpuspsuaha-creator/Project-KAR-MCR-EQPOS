@@ -506,6 +506,43 @@ body::after {
 <div class="actions" style="margin-top:12px">
 <button class="btn primary" onclick="simpan()">Simpan (Enter)</button>
 <!-- <button class="btn secondary" onclick="resetForm()">Reset</button> -->
+<button id="lockZoomBtn">🔒</button>
+
+<style>
+#lockZoomBtn {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;             /* pastikan paling atas */
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #6b7280;         /* abu-abu elegan */
+  color: #f9fafb;              /* putih terang */
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  padding: 0;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+#lockZoomBtn:hover {
+  background: #4b5563;          /* sedikit lebih gelap saat hover */
+  transform: translateX(-50%) scale(1.1);
+}
+
+/* Pastikan tombol tidak terpotong di iPhone / notch */
+@supports(padding: env(safe-area-inset-bottom)) {
+  #lockZoomBtn {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}
+</style>
 </div>
 </div>
 
@@ -1030,44 +1067,6 @@ if ('serviceWorker' in navigator) {
     .catch(err => console.error('Service Worker gagal:', err));
 }
 </script>
-
-<button id="lockZoomBtn">🔒</button>
-
-<style>
-#lockZoomBtn {
-  position: fixed;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 999999;             /* pastikan paling atas */
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: #6b7280;         /* abu-abu elegan */
-  color: #f9fafb;              /* putih terang */
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  padding: 0;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-#lockZoomBtn:hover {
-  background: #4b5563;          /* sedikit lebih gelap saat hover */
-  transform: translateX(-50%) scale(1.1);
-}
-
-/* Pastikan tombol tidak terpotong di iPhone / notch */
-@supports(padding: env(safe-area-inset-bottom)) {
-  #lockZoomBtn {
-    bottom: calc(12px + env(safe-area-inset-bottom));
-  }
-}
-</style>
 
 <script>
 const lockBtn = document.getElementById('lockZoomBtn');
