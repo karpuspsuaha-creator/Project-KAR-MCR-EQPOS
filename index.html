@@ -358,6 +358,14 @@ body::after {
   gap: 10px;
 }
 
+.pagination{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  margin-top:12px;
+}
+
 .copyright{
   text-align:center;
   font-size:12px;
@@ -597,8 +605,9 @@ lockBtn.addEventListener('click', toggleZoomLock);
 <tbody id="tbody"></tbody>
 </table>
 <div class="actions far" style="margin-top:12px;">
-  <div class="pagination" style="display:flex; justify-content:flex-start; gap:8px; margin-top:12px;">
+  <div class="pagination" style="display:flex; align-items:center; gap:10px; margin-top:12px;">
   <button class="btn secondary" id="prevBtn">Prev</button>
+  <span id="pageInfo" class="muted"></span>
   <button class="btn secondary" id="nextBtn">Next</button>
 </div>
 </div>
@@ -969,6 +978,12 @@ function render(){
 
   });
 
+  // TAMBAHAN PAGE INFO
+const totalPage = Math.ceil(data.length / perPage) || 1;
+
+document.getElementById('pageInfo').textContent =
+`Page ${page + 1} / ${totalPage}`;
+
 }
 
 document.getElementById('prevBtn').onclick = ()=>{
@@ -999,8 +1014,6 @@ document.getElementById('nextBtn').onclick = ()=>{
 
 }
 
-render();
-
 function clearFilter(){
   document.getElementById('filterShift').value = '';
   document.getElementById('filterDate').value = '';
@@ -1008,9 +1021,6 @@ function clearFilter(){
   render();
 }
 
-<span id="pageInfo"></span>
-document.getElementById('pageInfo').textContent =
-`Page ${page+1} / ${Math.ceil(data.length/perPage) || 1}`;
 
 // ==== HAPUS ====
 function hapusModern(i,btn){
@@ -1146,38 +1156,6 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log('✅ Service Worker aktif, siap offline'))
     .catch(err => console.error('Service Worker gagal:', err));
 }
-</script>
-
-<script>
-const lockBtn = document.getElementById('lockZoomBtn');
-let zoomLocked = true; // default terkunci
-
-function toggleZoomLock() {
-  const meta = document.querySelector('meta[name=viewport]');
-  if (!meta) return;
-
-  if (zoomLocked) {
-    // buka zoom (boleh pinch)
-    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
-    lockBtn.textContent = '🔓';
-    lockBtn.style.background = '#22c55e'; // hijau
-    zoomLocked = false;
-  } else {
-    // kunci zoom (mati total)
-    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-    lockBtn.textContent = '🔒';
-    lockBtn.style.background = '#6b7280'; // abu-abu elegan
-    zoomLocked = true;
-  }
-}
-
-lockBtn.addEventListener('click', toggleZoomLock);
-
-// Pastikan semua input font minimal 16px supaya HP tidak auto-zoom
-document.querySelectorAll('input, select, textarea').forEach(el => {
-  el.style.fontSize = '16px';
-  el.style.webkitTextSizeAdjust = '100%';
-});
 </script>
   
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
