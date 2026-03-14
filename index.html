@@ -56,18 +56,20 @@ input:focus,select:focus{
   box-shadow:0 0 0 2px rgba(56,189,248,.4);
 }
 
+<!-- Tombol gembok -->
 <button id="lockZoomBtn" style="
   position: fixed;
   bottom: 20px;
   right: 20px;
-  z-index: 999;
-  padding: 10px;
+  z-index: 9999;       /* pastikan paling atas */
+  padding: 12px 14px;
   border-radius: 50%;
   background: var(--accent-2);
   color: #fff;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 ">🔒</button>
 
 /* untuk semua input yang belum ada font-size */
