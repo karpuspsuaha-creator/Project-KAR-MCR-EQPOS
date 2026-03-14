@@ -932,6 +932,11 @@ function render(){
   });
 }
 
+<div class="actions far" style="margin-top:12px;">
+  <button class="btn secondary" id="prevBtn">Prev</button>
+  <button class="btn secondary" id="nextBtn">Next</button>
+</div>
+
 function clearFilter(){
   document.getElementById('filterShift').value = '';
   document.getElementById('filterDate').value = '';
@@ -1088,6 +1093,8 @@ function renderPage() {
 
 document.getElementById('prevBtn').addEventListener('click',()=>{ page++; renderPage(); });
 document.getElementById('nextBtn').addEventListener('click',()=>{ page--; renderPage(); });
+document.getElementById('filterShift').addEventListener('change',()=>{ page=0; render(); });
+document.getElementById('filterDate').addEventListener('change',()=>{ page=0; render(); });
 </script>
   
 <script>
