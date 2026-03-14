@@ -403,16 +403,25 @@ body::after {
 ">🔒</button>
 
 <script>
-const btn = document.getElementById('lockZoomBtn');
-let locked = true; // default terkunci
-btn.onclick = () => {
-  locked = !locked;
-  btn.textContent = locked ? '🔒' : '🔓';
-  btn.style.background = locked ? '#6b7280' : '#22c55e'; // abu-abu / hijau
-  if (locked) {
-    document.querySelectorAll('input, select, textarea').forEach(el => el.style.fontSize='16px');
+const lockBtn = document.getElementById('lockZoomBtn');
+let zoomLocked = true;
+
+function toggleZoomLock() {
+  const meta = document.querySelector('meta[name=viewport]');
+  if (zoomLocked) {
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes');
+    lockBtn.textContent = '🔓';
+    lockBtn.style.background = '#22c55e'; // hijau
+    zoomLocked = false;
+  } else {
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    lockBtn.textContent = '🔒';
+    lockBtn.style.background = '#6b7280'; // abu-abu
+    zoomLocked = true;
   }
-};
+}
+
+lockBtn.addEventListener('click', toggleZoomLock);
 </script>
 
 <div id="lokasiInfo">GPS: mencari...</div>
