@@ -1081,10 +1081,22 @@ function exportExcelFiltered(){
 
   const worksheet = XLSX.utils.json_to_sheet(rows);
 
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Equipment");
+    // AUTO FIT COLUMN
+    const colWidths = [];
 
-  XLSX.writeFile(workbook, `Equipment_${Date.now()}.xlsx`);
+    rows.forEach(row => {
+      Object.keys(row).forEach((key, i) => {
+        const val = row[key] ? row[key].toString() : "";
+        colWidths[i] = Math.max(colWidths[i] || key.length, val.length);
+      });
+    });
+
+    worksheet["!cols"] = colWidths.map(w => ({ wch: w + 3 }));
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Equipment");
+
+    XLSX.writeFile(workbook, `Equipment_${Date.now()}.xlsx`);
 
   showPopup('Data berhasil diexport ke Excel!','success');
 }
