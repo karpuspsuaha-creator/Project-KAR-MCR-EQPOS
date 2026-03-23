@@ -1,18 +1,23 @@
 // sw.js
-const CACHE_VERSION = '20250904'; // bisa diganti saat deploy
+const CACHE_VERSION = '20250905'; // ganti setiap deploy
 const CACHE_NAME = `Equipment-cache-${CACHE_VERSION}`;
 
+// ===== TAMBAHAN: fallback =====
+const OFFLINE_URL = './';
+
+// ===== ASSETS =====
 const ASSETS_TO_CACHE = [
   './',
+  './index.html', // WAJIB biar aman offline
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
-  './style.css',  // kalau ada file CSS terpisah
-  './script.js',   // kalau ada file JS terpisah
+  './style.css',
+  './script.js',
   './logo-harita-group.jpg'
 ];
 
-// Install - cache assets
+// ===== INSTALL =====
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS_TO_CACHE))
@@ -20,7 +25,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Activate - hapus cache lama
+// ===== ACTIVATE =====
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -32,34 +37,63 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch
+// ===== FETCH =====
 self.addEventListener('fetch', event => {
-  const requestURL = new URL(event.request.url);
+  const request = event.request;
+  const requestURL = new URL(request.url);
 
-  // Network-first untuk index.html
-  if (requestURL.pathname === '/' || requestURL.pathname.endsWith('index.html')) {
+  // ==============================
+  // ✅ HANDLE NAVIGATION (REFRESH / BUKA HALAMAN)
+  // ==============================
+  if (request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then(resp => {
-          const clone = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return resp;
+      fetch(request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => {
+          return caches.match(request)
+            .then(res => res || caches.match(OFFLINE_URL));
+        })
     );
     return;
   }
 
-  // Cache-first untuk assets lain
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      return cached || fetch(event.request).then(resp => {
-        if (event.request.method === 'GET') {
+  // ==============================
+  // ✅ INDEX.HTML (punya kamu + fallback)
+  // ==============================
+  if (requestURL.pathname === '/' || requestURL.pathname.endsWith('index.html')) {
+    event.respondWith(
+      fetch(request)
+        .then(resp => {
           const clone = resp.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-        }
-        return resp;
-      }).catch(() => cached);
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          return resp;
+        })
+        .catch(() => {
+          return caches.match(request)
+            .then(res => res || caches.match(OFFLINE_URL));
+        })
+    );
+    return;
+  }
+
+  // ==============================
+  // ✅ ASSETS (CACHE FIRST)
+  // ==============================
+  event.respondWith(
+    caches.match(request).then(cached => {
+      return cached || fetch(request)
+        .then(resp => {
+          if (request.method === 'GET') {
+            const clone = resp.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          }
+          return resp;
+        })
+        .catch(() => cached || caches.match(OFFLINE_URL));
     })
   );
 });
