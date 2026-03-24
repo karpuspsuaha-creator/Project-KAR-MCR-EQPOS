@@ -188,7 +188,7 @@ body::after {
 #lokasiInfo {
   background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px); /* 🔥 support iOS */
+  -webkit-backdrop-filter: blur(8px);
 
   border: 1px solid rgba(255,255,255,0.1);
   color: white;
@@ -204,8 +204,8 @@ body::after {
   box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   transition: transform 0.25s ease, opacity 0.25s ease;
 
-  z-index: 998;
-  opacity: 0.95; /* 🔥 biar lebih halus */
+  z-index: 9999; /* 🔥 PALING ATAS */
+  opacity: 0.95;
 }
 
 #lokasiInfo:hover {
