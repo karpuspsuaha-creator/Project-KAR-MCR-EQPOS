@@ -15,6 +15,7 @@ const ASSETS_TO_CACHE = [
   './style.css',
   './script.js',
   './Code_Unit.js',
+  './Master_Unit.json',
   './logo-harita-group.jpg'
 ];
 
